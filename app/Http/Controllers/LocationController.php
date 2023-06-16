@@ -8,8 +8,11 @@ use Illuminate\Http\Request;
 
 class LocationController extends Controller
 {
-    public function index(){
-        return view('home');
+    public function index() {
+        
+        $locations = Location::whereRaw('1 = 1')->orderBy('created_at', 'desc')->get();
+
+        return view('home', ['locations' => $locations]);
     }
 
     public function store(StoreLocationRequest $request){

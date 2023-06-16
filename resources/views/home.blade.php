@@ -41,6 +41,17 @@
             </div>
         @endif
 
+        <div class="card mt-4">
+            <div class="card-header">Existing Points of Interest</div>
+            <ul class="list-group list-group-flush">
+            @forelse($locations as $location)
+                <li class="list-group-item">{{ $location->name }} - {{ $location->latitude }}, {{ $location->longitude }}</li>
+            @empty
+                <li class="list-group-item text-muted">No points of interest recorded yet.</li>
+            @endforelse
+            </ul>
+        </div>
+
     </div>
 </form>
 
