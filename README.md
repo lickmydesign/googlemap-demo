@@ -16,10 +16,9 @@ Built with a Postgre DB
 
 ## Caveats / Improvements
 
-- load the markers onto the map
-- minify js/css in build
 - update libraries
-- Display the name next to the existing markers on hover.
+- minify js/css in build
+- Display the name next to the existing markers on hover/click.
 - ability to delete an existing POI on the map my clicking it (with confirm dialog 'Are you sure?')
 - general styling and layout improvements (mobile testing)
 - move the Google API key to the .env

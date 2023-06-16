@@ -65,6 +65,12 @@
         
         const defaultLocation = { lat: 51.246271, lng: -1.992213 }; // wiltshire
         const markerIcon = 'https://developers.google.com/maps/documentation/javascript/examples/full/images/beachflag.png';
+        
+        var locations = [
+        @foreach ($locations as $location)
+            [ {{ $location->latitude }}, {{ $location->longitude }} ],
+        @endforeach
+        ];
 
         function initMap() {
             map = new google.maps.Map(document.getElementById("map"), {
@@ -72,6 +78,15 @@
                 zoom: 8,
                 scrollwheel: true,
             });
+
+            for (i = 0; i < locations.length; i++) {
+                var location = new google.maps.LatLng(locations[i][0], locations[i][1]);
+
+                var exsiting_marker = new google.maps.Marker({
+                    position: location,
+                    map: map,
+                }); 
+            };
 
             let marker = new google.maps.Marker({
                 position: defaultLocation,
