@@ -6,6 +6,8 @@
 
 <form action="{{ route('store') }}" method="post">
     @csrf
+    <input type="hidden" class="form-control" placeholder="latitude" name="latitude" id="latitude">
+    <input type="hidden" class="form-control" placeholder="longitude" name="longitude" id="longitude">
 
     <div id="map" style="height:500px; width: 100%;" class="my-3"></div>
 
@@ -18,19 +20,12 @@
             </ul>
         </div>
 
-        <div class="row">
-            <div class="col-md-3">
-                <input type="text" class="form-control" placeholder="name" name="name" id="name ">
+        <div class="form-inline">
+            <div class="form-group mb-2">
+                <label for="name" class="sr-only">Name</label>
+                <input type="text" class="form-control" placeholder="name" name="name" id="name">
             </div>
-            <div class="col-md-3">
-                <input type="text" class="form-control" placeholder="latitude" name="latitude" id="latitude">
-            </div>
-            <div class="col-md-3">
-                <input type="text" class="form-control" placeholder="longitude" name="longitude" id="longitude">
-            </div>
-            <div class="col-md-3">
-                <button type="submit" class="btn btn-primary">Add Point of Interest</button>
-            </div>
+            <button type="submit" class="btn btn-primary mb-2">Add Point of Interest</button>
         </div>
 
         @includeWhen($errors->any(), '_errors')
