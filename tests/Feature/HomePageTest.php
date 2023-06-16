@@ -22,6 +22,6 @@ class HomePageTest extends TestCase
     {
         $view = $this->withViewErrors([])->view('home');
 
-        $view->assertSee('Home');
+        $view->assertSee('Google Maps Demo');
     }
 }

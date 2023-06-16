@@ -2,6 +2,7 @@
 
 namespace Database\Factories;
 
+use App\Models\Location;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 class LocationFactory extends Factory
@@ -15,9 +16,9 @@ class LocationFactory extends Factory
     public function definition(): array
     {
         return [
-            'name' => fake()->name(),
-            'lat' => fake()->randomFloat(2, 1, 100),
-            'long' => fake()->randomFloat(2, 1, 100),
+            'name' => $this->faker->name,
+            'latitude' => $this->faker->randomFloat(8, 6, 100),
+            'longitude' => $this->faker->randomFloat(9, 6, 100),
         ];
     }
 }
