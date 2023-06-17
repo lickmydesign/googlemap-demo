@@ -4,15 +4,12 @@
 
 @section('content')
 
-<form action="{{ route('store') }}" method="post">
-    @csrf
-    <input type="hidden" class="form-control" placeholder="latitude" name="latitude" id="latitude">
-    <input type="hidden" class="form-control" placeholder="longitude" name="longitude" id="longitude">
+<div id="map" style="height:500px; width: 100%;" class="my-3"></div>
 
-    <div id="map" style="height:500px; width: 100%;" class="my-3"></div>
-
-    <div class="container">
+<div class="container">
+      
         <div class="row">
+
             <div class="col-md-6">
                 <div class="alert alert-info">
                     <h2><i class="material-icons">info_outline</i> Instructions</h2>
@@ -25,40 +22,54 @@
 
             <div class="col-md-6">
 
-            <div class="form-inline">
-                <div class="form-group mb-2">
-                    <label for="name" class="sr-only">Name</label>
-                    <input type="text" class="form-control mr-2" placeholder="name (optional)" name="name" id="name">
+                <form action="{{ route('locations.store') }}" method="post" class="form-inline">
+                    @csrf
+                    <input type="hidden" class="form-control" placeholder="latitude" name="latitude" id="latitude">
+                    <input type="hidden" class="form-control" placeholder="longitude" name="longitude" id="longitude">
+
+                    <div class="form-group mb-2">
+                        <label for="name" class="sr-only">Name</label>
+                        <input type="text" class="form-control mr-2" placeholder="name (optional)" name="name" id="name">
+                    </div>
+                    <button type="submit" class="btn btn-primary mb-2">Add Point of Interest</button>
+                </form>
+
+                @includeWhen($errors->any(), '_errors')
+
+                @if (session('success'))
+                <div class="alert alert-success mt-3">
+                    <i class="material-icons" style="display: inline-flex; vertical-align: top;">check</i> {{ session('success') }}
                 </div>
-                <button type="submit" class="btn btn-primary mb-2">Add Point of Interest</button>
-            </div>
+                @endif
 
-            @includeWhen($errors->any(), '_errors')
+                <div class="card mt-4">
+                    <div class="card-header">Existing Points of Interest</div>
+                    <ul class="list-group list-group-flush">
+                    @isset($locations)
+                        @forelse($locations as $location)
+                            <li class="list-group-item">
+                                <form method="post" action="{{ route('locations.destroy', [$location]) }}">
+                                    @csrf
+                                    @method('DELETE')
+                                    {{ $location->name }} - {{ $location->latitude }}, {{ $location->longitude }} 
+                                    <span class="text-muted ml-2">(Created: {{ $location->created_at }})</span> 
+                                    <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Are you sure you want to delete this point?')">
+                                        <i class="material-icons md-18" style="display: inline-flex; font-size: 150%; vertical-align: top;" title="Delete">delete</i>
+                                    </button>
+                                </form>
+                            </li>
+                        @empty
+                            <li class="list-group-item text-muted">No points of interest recorded yet.</li>
+                        @endforelse                       
+                    @endisset
+                    </ul>
+                </div>
 
-            @if (session('success'))
-            <div class="alert alert-success mt-3">
-                <i class="material-icons" style="display: inline-flex; vertical-align: top;">check</i> {{ session('success') }}
-            </div>
-            @endif
+            </div> <!-- col-md-6 -->
+        
+        </div> <!-- row -->
 
-            <div class="card mt-4">
-                <div class="card-header">Existing Points of Interest</div>
-                <ul class="list-group list-group-flush">
-                @forelse($locations as $location)
-                    <li class="list-group-item">
-                        {{ $location->name }} - {{ $location->latitude }}, {{ $location->longitude }} 
-                        <span class="text-muted ml-2">(Created: {{ $location->created_at }})</span>
-                    </li>
-                @empty
-                    <li class="list-group-item text-muted">No points of interest recorded yet.</li>
-                @endforelse
-                </ul>
-            </div>
-
-        </div> <!-- col-md-6 -->     
-
-    </div>
-</form>
+</div> <!-- container -->
 
 <script>
         let map;
@@ -67,9 +78,11 @@
         const markerIcon = 'https://developers.google.com/maps/documentation/javascript/examples/full/images/beachflag.png';
         
         var locations = [
-        @foreach ($locations as $location)
-            [ {{ $location->latitude }}, {{ $location->longitude }} ],
-        @endforeach
+        @isset($locations)
+            @foreach ($locations as $l)
+                [ {{ $l->latitude }}, {{ $l->longitude }} ],
+            @endforeach
+        @endisset
         ];
 
         function initMap() {

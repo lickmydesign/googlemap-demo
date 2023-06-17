@@ -19,6 +19,6 @@ Built with a Postgre DB
 - update libraries
 - minify js/css in build
 - Display the name next to the existing markers on hover/click.
-- ability to delete an existing POI on the map my clicking it (with confirm dialog 'Are you sure?')
-- general styling and layout improvements (mobile testing)
+- move the locations data call for the existing pois to the api (return as json, via async)
 - move the Google API key to the .env
+- general styling and layout improvements (mobile testing)

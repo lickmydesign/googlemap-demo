@@ -17,4 +17,7 @@ use Illuminate\Support\Facades\Route;
 
 Route::get('/',[LocationController::class, 'index'])->name('home');
 
-Route::post('/store',[LocationController::class, 'store'])->name('store');
+Route::resource('locations', LocationController::class)
+    ->missing(function (Request $request) {
+        return redirect()->route('home');
+    });
