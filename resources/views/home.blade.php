@@ -14,7 +14,7 @@
                 <div class="alert alert-info">
                     <h2><i class="material-icons">info_outline</i> Instructions</h2>
                     <ul>
-                        <li>Click a location on the map or drag the current flag marker to change the location.</li>
+                        <li>Click a location on the map or drag the flag marker to change location.</li>
                         <li>Click the "Add Point of Interest" button to save a point of interest to the database.</li>
                     </ul>
                 </div>
@@ -51,7 +51,7 @@
                                 <form method="post" action="{{ route('locations.destroy', [$location]) }}">
                                     @csrf
                                     @method('DELETE')
-                                    {{ $location->name }} - {{ $location->latitude }}, {{ $location->longitude }} 
+                                    {{ $loop->iteration }}. {{ $location->name }} - {{ $location->latitude }}, {{ $location->longitude }} 
                                     <span class="text-muted ml-2">(Created: {{ $location->created_at }})</span> 
                                     <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Are you sure you want to delete this point?')">
                                         <i class="material-icons md-18" style="display: inline-flex; font-size: 150%; vertical-align: top;" title="Delete">delete</i>
@@ -72,57 +72,81 @@
 </div> <!-- container -->
 
 <script>
-        let map;
-        
-        const defaultLocation = { lat: 51.246271, lng: -1.992213 }; // wiltshire
-        const markerIcon = 'https://developers.google.com/maps/documentation/javascript/examples/full/images/beachflag.png';
-        
-        var locations = [
-        @isset($locations)
-            @foreach ($locations as $l)
-                [ {{ $l->latitude }}, {{ $l->longitude }} ],
-            @endforeach
-        @endisset
-        ];
+      
+    const defaultLocation = { lat: 51.246271, lng: -1.992213 }; // wiltshire
+    const markerIcon = 'https://developers.google.com/maps/documentation/javascript/examples/full/images/beachflag.png';
+    
+    const locations = [
+    @isset($locations)
+        @foreach ($locations as $l)
+            { 
+                position: { lat: {{ $l->latitude }}, lng: {{ $l->longitude }} }, 
+                title: "{{ $l->name }}", 
+            },
+        @endforeach
+    @endisset
+    ];
 
-        function initMap() {
-            map = new google.maps.Map(document.getElementById("map"), {
-                center: defaultLocation,
-                zoom: 8,
-                scrollwheel: true,
+    async function initMap() {
+        const { Map, InfoWindow } = await google.maps.importLibrary("maps");
+        const { AdvancedMarkerElement, PinElement } = await google.maps.importLibrary(
+            "marker"
+        );
+
+        const map = new Map(document.getElementById("map"), {
+            center: defaultLocation,
+            zoom: 8,
+            scrollwheel: true,
+            mapTypeControl: false,
+            mapId: 'DEMO_MAP_ID',
+        });
+
+        // Create an info window to share between markers.
+        const infoWindow = new InfoWindow();
+
+        locations.forEach(({ position, title }, i) => {
+            const pin = new PinElement({
+                glyph: `${i + 1}`,
+            });
+            var exsiting_marker = new AdvancedMarkerElement({
+                position,
+                map,
+                title: `${i + 1}. ${title}`,
+                content: pin.element,
             });
 
-            for (i = 0; i < locations.length; i++) {
-                var location = new google.maps.LatLng(locations[i][0], locations[i][1]);
+            // Add a click listener for each marker, and set up the info window.
+            exsiting_marker.addListener("click", ({ domEvent, latLng }) => {
+                const { target } = domEvent;
 
-                var exsiting_marker = new google.maps.Marker({
-                    position: location,
-                    map: map,
-                }); 
-            };
-
-            let marker = new google.maps.Marker({
-                position: defaultLocation,
-                map: map,
-                draggable: true,
-                icon: markerIcon
+                infoWindow.close();
+                infoWindow.setContent(exsiting_marker.title);
+                infoWindow.open(exsiting_marker.map, exsiting_marker);
             });
+        });
 
-            google.maps.event.addListener(marker,'position_changed',
-                function (){
-                    let lat = marker.position.lat()
-                    let lng = marker.position.lng()
-                    $('#latitude').val(lat)
-                    $('#longitude').val(lng)
-                })
+        let marker = new google.maps.Marker({
+            position: defaultLocation,
+            map: map,
+            draggable: true,
+            icon: markerIcon
+        });
 
-            google.maps.event.addListener(map,'click',
-            function (event){
-                pos = event.latLng
-                marker.setPosition(pos)
+        google.maps.event.addListener(marker,'position_changed',
+            function (){
+                let lat = marker.position.lat()
+                let lng = marker.position.lng()
+                $('#latitude').val(lat)
+                $('#longitude').val(lng)
             })
-        }
-    </script>
-    <script async defer src="https://maps.googleapis.com/maps/api/js?key={{ env('GOOGLE_MAPS_KEY') }}&callback=initMap" type="text/javascript"></script>
+
+        google.maps.event.addListener(map,'click',
+        function (event){
+            pos = event.latLng
+            marker.setPosition(pos)
+        })
+    }
+</script>
+<script async defer src="https://maps.googleapis.com/maps/api/js?key={{ env('GOOGLE_MAPS_KEY') }}&callback=initMap" type="text/javascript"></script>
 
 @endsection
