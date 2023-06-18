@@ -21,9 +21,12 @@ class LocationController extends Controller
 
         $location = Location::create($validated); # Mass asignment
 
+        $location_name = $location->name;
+        $success_mess = $location_name ? "Location '{$location_name}' saved successfully" : "Location saved successfully";
+
         return redirect()
             ->route('home')
-            ->with('success', 'Location saved successfully');
+            ->with('success', $success_mess);
 
         // return response()->json(['success' => true]);
     }
@@ -44,10 +47,13 @@ class LocationController extends Controller
 
     public function destroy(Location $location)
     {
+        $location_name = $location->name;
+        $success_mess = $location_name ? "Location '{$location_name}' deleted successfully" : "Location deleted successfully";
+
         $location->delete();
 
         return redirect()
             ->route('home')
-            ->with('success', 'Location deleted successfully');
+            ->with('success', $success_mess);
     }
 }
